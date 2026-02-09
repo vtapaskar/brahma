@@ -1,0 +1,28 @@
+{
+  "server": {
+    "address": "0.0.0.0",
+    "port": 8080
+  },
+  "splunk": {
+    "host": "splunk.example.com",
+    "port": 8088,
+    "token": "YOUR_SPLUNK_HEC_TOKEN",
+    "index": "sonic_metrics",
+    "source": "brahma",
+    "source_type": "sonic:metrics",
+    "use_tls": true
+  },
+  "s3": {
+    "region": "us-west-2",
+    "bucket": "sonic-crash-reports",
+    "prefix": "brahma",
+    "access_key_id": "",
+    "secret_access_key": "",
+    "endpoint": ""
+  },
+  "metrics": {
+    "buffer_size": 100,
+    "flush_interval_seconds": 30,
+    "device_types": ["switch", "router", "leaf", "spine"]
+  }
+}
