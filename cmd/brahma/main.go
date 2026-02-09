@@ -9,6 +9,7 @@ import (
 
 	"github.com/vtapaskar/brahma/internal/config"
 	"github.com/vtapaskar/brahma/internal/metrics"
+	"github.com/vtapaskar/brahma/internal/registry"
 	"github.com/vtapaskar/brahma/internal/server"
 	"github.com/vtapaskar/brahma/internal/splunk"
 	"github.com/vtapaskar/brahma/internal/storage"
@@ -38,9 +39,11 @@ func main() {
 
 	splunkClient := splunk.NewClient(cfg.Splunk, logger)
 
+	deviceRegistry := registry.NewRegistry(splunkClient, logger)
+
 	metricsCollector := metrics.NewCollector(cfg.Metrics, splunkClient, s3Client, logger)
 
-	srv := server.New(cfg.Server, metricsCollector, logger)
+	srv := server.New(cfg.Server, metricsCollector, deviceRegistry, logger)
 
 	go func() {
 		if err := srv.Start(); err != nil {

@@ -112,6 +112,14 @@ func (c *S3Client) GenerateKey(deviceID, reportType, reportID, filename string) 
 	return path.Join(timestamp, deviceID, reportType, fmt.Sprintf("%s_%s", reportID, filename))
 }
 
+func (c *S3Client) GenerateLogKey(deviceUID, logID, logType string) string {
+	suffix := ".crash"
+	if logType == "backtrace" {
+		suffix = ".backtrace"
+	}
+	return path.Join(deviceUID, fmt.Sprintf("%s%s", logID, suffix))
+}
+
 func (c *S3Client) Delete(key string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
