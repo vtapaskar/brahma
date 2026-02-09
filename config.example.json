@@ -3,6 +3,13 @@
     "address": "0.0.0.0",
     "port": 8080
   },
+  "grpc": {
+    "address": "0.0.0.0",
+    "port": 50051,
+    "enable_tls": false,
+    "cert_file": "",
+    "key_file": ""
+  },
   "splunk": {
     "host": "splunk.example.com",
     "port": 8088,

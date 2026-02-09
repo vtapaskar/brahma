@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package brahma.v1;
+
+option go_package = "github.com/vtapaskar/brahma/proto/brahma/v1;brahmav1";
+
+import "google/protobuf/timestamp.proto";
+
+service LogService {
+  rpc UploadCrashReport(stream CrashReportChunk) returns (LogUploadResponse);
+  rpc UploadBacktrace(stream BacktraceChunk) returns (LogUploadResponse);
+  rpc GetLogMetadata(GetLogMetadataRequest) returns (LogMetadataResponse);
+  rpc ListLogs(ListLogsRequest) returns (ListLogsResponse);
+}
+
+message CrashReportChunk {
+  oneof data {
+    CrashReportMetadata metadata = 1;
+    bytes chunk = 2;
+  }
+}
+
+message CrashReportMetadata {
+  string uid = 1;
+  string process_tag = 2;
+  string version = 3;
+  string filename = 4;
+}
+
+message BacktraceChunk {
+  oneof data {
+    BacktraceMetadata metadata = 1;
+    bytes chunk = 2;
+  }
+}
+
+message BacktraceMetadata {
+  string uid = 1;
+  string process_tag = 2;
+  string version = 3;
+  string filename = 4;
+}
+
+message LogUploadResponse {
+  string status = 1;
+  string log_id = 2;
+  string uid = 3;
+  string s3_key = 4;
+  string message = 5;
+}
+
+message GetLogMetadataRequest {
+  string log_id = 1;
+}
+
+message LogMetadataResponse {
+  string log_id = 1;
+  string device_uid = 2;
+  string log_type = 3;
+  string process_tag = 4;
+  string version = 5;
+  string filename = 6;
+  string s3_key = 7;
+  google.protobuf.Timestamp timestamp = 8;
+}
+
+message ListLogsRequest {
+  string uid = 1;
+  string log_type = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message ListLogsResponse {
+  repeated LogMetadataResponse logs = 1;
+  int32 total = 2;
+}

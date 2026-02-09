@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package brahma.v1;
+
+option go_package = "github.com/vtapaskar/brahma/proto/brahma/v1;brahmav1";
+
+import "google/protobuf/timestamp.proto";
+
+service DeviceService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Unregister(UnregisterRequest) returns (UnregisterResponse);
+  rpc GetDevice(GetDeviceRequest) returns (DeviceResponse);
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+}
+
+message RegisterRequest {
+  string foreign_key = 1;
+  string hostname = 2;
+  string ip_address = 3;
+  string device_type = 4;
+  string platform = 5;
+  string version = 6;
+  map<string, string> labels = 7;
+}
+
+message RegisterResponse {
+  string uid = 1;
+  string foreign_key = 2;
+  string status = 3;
+  google.protobuf.Timestamp registered_at = 4;
+}
+
+message UnregisterRequest {
+  string uid = 1;
+}
+
+message UnregisterResponse {
+  string status = 1;
+  string uid = 2;
+}
+
+message GetDeviceRequest {
+  string uid = 1;
+}
+
+message DeviceResponse {
+  string uid = 1;
+  string foreign_key = 2;
+  string hostname = 3;
+  string ip_address = 4;
+  string device_type = 5;
+  string platform = 6;
+  string version = 7;
+  map<string, string> labels = 8;
+  google.protobuf.Timestamp registered_at = 9;
+  google.protobuf.Timestamp last_seen = 10;
+}
+
+message ListDevicesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListDevicesResponse {
+  repeated DeviceResponse devices = 1;
+  int32 total = 2;
+}
+
+message HeartbeatRequest {
+  string uid = 1;
+}
+
+message HeartbeatResponse {
+  string status = 1;
+  google.protobuf.Timestamp server_time = 2;
+}

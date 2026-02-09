@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package brahma.v1;
+
+option go_package = "github.com/vtapaskar/brahma/proto/brahma/v1;brahmav1";
+
+import "google/protobuf/timestamp.proto";
+
+service MetricsService {
+  rpc ReportCPUStats(CPUStatsRequest) returns (MetricsResponse);
+  rpc ReportProcessStats(ProcessStatsRequest) returns (MetricsResponse);
+  rpc ReportMgmtNetworkStats(MgmtNetworkStatsRequest) returns (MetricsResponse);
+  rpc ReportRouterBaseState(RouterBaseStateRequest) returns (MetricsResponse);
+  rpc StreamMetrics(stream MetricsStreamRequest) returns (MetricsResponse);
+}
+
+message MetricsResponse {
+  string status = 1;
+  string uid = 2;
+  string message = 3;
+}
+
+message CPUStatsRequest {
+  string uid = 1;
+  double usage_percent = 2;
+  double user_percent = 3;
+  double system_percent = 4;
+  double idle_percent = 5;
+  double iowait_percent = 6;
+  double load_avg_1min = 7;
+  double load_avg_5min = 8;
+  double load_avg_15min = 9;
+  int32 num_cores = 10;
+  repeated double per_core_usage = 11;
+}
+
+message ProcessStatsRequest {
+  string uid = 1;
+  int32 total_count = 2;
+  int32 running_count = 3;
+  int32 sleeping_count = 4;
+  int32 zombie_count = 5;
+  repeated ProcessInfo processes = 6;
+}
+
+message ProcessInfo {
+  int32 pid = 1;
+  string name = 2;
+  string state = 3;
+  double cpu_percent = 4;
+  double mem_percent = 5;
+  uint64 memory_rss = 6;
+  int32 threads = 7;
+  int64 start_time = 8;
+  string command = 9;
+}
+
+message MgmtNetworkStatsRequest {
+  string uid = 1;
+  string interface_name = 2;
+  string status = 3;
+  string ip_address = 4;
+  string netmask = 5;
+  string gateway = 6;
+  string mac_address = 7;
+  int64 speed = 8;
+  string duplex = 9;
+  uint64 rx_bytes = 10;
+  uint64 tx_bytes = 11;
+  uint64 rx_packets = 12;
+  uint64 tx_packets = 13;
+  uint64 rx_errors = 14;
+  uint64 tx_errors = 15;
+  uint64 rx_dropped = 16;
+  uint64 tx_dropped = 17;
+  repeated string dns_servers = 18;
+  repeated string ntp_servers = 19;
+}
+
+message RouterBaseStateRequest {
+  string uid = 1;
+  string hostname = 2;
+  string platform = 3;
+  string hardware_version = 4;
+  string software_version = 5;
+  string sonic_version = 6;
+  string kernel_version = 7;
+  int64 uptime_seconds = 8;
+  google.protobuf.Timestamp boot_time = 9;
+  string serial_number = 10;
+  MgmtStatus mgmt_network_status = 11;
+  DNSStatus dns_status = 12;
+  DHCPStatus dhcp_status = 13;
+  LLDPStatus lldp_status = 14;
+  uint64 memory_total = 15;
+  uint64 memory_used = 16;
+  uint64 memory_free = 17;
+  uint64 disk_total = 18;
+  uint64 disk_used = 19;
+  uint64 disk_free = 20;
+}
+
+message MgmtStatus {
+  string status = 1;
+  string ip_address = 2;
+  string gateway = 3;
+  bool reachable = 4;
+}
+
+message DNSStatus {
+  bool enabled = 1;
+  repeated string servers = 2;
+  string domain = 3;
+  repeated string search_list = 4;
+  bool operational = 5;
+}
+
+message DHCPStatus {
+  bool enabled = 1;
+  string state = 2;
+  int64 lease_time = 3;
+  int64 renew_time = 4;
+  string server_ip = 5;
+}
+
+message LLDPStatus {
+  bool enabled = 1;
+  string chassis_id = 2;
+  string system_name = 3;
+  int32 neighbor_count = 4;
+  repeated LLDPNeighbor neighbors = 5;
+}
+
+message LLDPNeighbor {
+  string local_port = 1;
+  string remote_chassis_id = 2;
+  string remote_port_id = 3;
+  string remote_system_name = 4;
+  string remote_port_desc = 5;
+  int32 ttl = 6;
+}
+
+message MetricsStreamRequest {
+  oneof metrics {
+    CPUStatsRequest cpu_stats = 1;
+    ProcessStatsRequest process_stats = 2;
+    MgmtNetworkStatsRequest mgmt_network_stats = 3;
+    RouterBaseStateRequest router_base_state = 4;
+  }
+}

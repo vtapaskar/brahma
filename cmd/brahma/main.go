@@ -8,9 +8,9 @@ import (
 	"syscall"
 
 	"github.com/vtapaskar/brahma/internal/config"
+	grpcserver "github.com/vtapaskar/brahma/internal/grpc"
 	"github.com/vtapaskar/brahma/internal/metrics"
 	"github.com/vtapaskar/brahma/internal/registry"
-	"github.com/vtapaskar/brahma/internal/server"
 	"github.com/vtapaskar/brahma/internal/splunk"
 	"github.com/vtapaskar/brahma/internal/storage"
 	"go.uber.org/zap"
@@ -43,17 +43,17 @@ func main() {
 
 	metricsCollector := metrics.NewCollector(cfg.Metrics, splunkClient, s3Client, logger)
 
-	srv := server.New(cfg.Server, metricsCollector, deviceRegistry, logger)
+	grpcSrv := grpcserver.NewServer(cfg.GRPC, metricsCollector, deviceRegistry, logger)
 
 	go func() {
-		if err := srv.Start(); err != nil {
-			logger.Fatal("Server failed", zap.Error(err))
+		if err := grpcSrv.Start(); err != nil {
+			logger.Fatal("gRPC server failed", zap.Error(err))
 		}
 	}()
 
-	logger.Info("Brahma service started",
-		zap.String("address", cfg.Server.Address),
-		zap.Int("port", cfg.Server.Port),
+	logger.Info("Brahma gRPC service started",
+		zap.String("address", cfg.GRPC.Address),
+		zap.Int("port", cfg.GRPC.Port),
 	)
 
 	sigChan := make(chan os.Signal, 1)
@@ -61,5 +61,6 @@ func main() {
 	<-sigChan
 
 	logger.Info("Shutting down...")
-	srv.Stop(ctx)
+	grpcSrv.Stop()
+	metricsCollector.Stop()
 }

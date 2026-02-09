@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Server  ServerConfig  `json:"server"`
+	GRPC    GRPCConfig    `json:"grpc"`
 	Splunk  SplunkConfig  `json:"splunk"`
 	S3      S3Config      `json:"s3"`
 	Metrics MetricsConfig `json:"metrics"`
@@ -16,6 +17,14 @@ type Config struct {
 type ServerConfig struct {
 	Address string `json:"address"`
 	Port    int    `json:"port"`
+}
+
+type GRPCConfig struct {
+	Address   string `json:"address"`
+	Port      int    `json:"port"`
+	EnableTLS bool   `json:"enable_tls"`
+	CertFile  string `json:"cert_file"`
+	KeyFile   string `json:"key_file"`
 }
 
 type SplunkConfig struct {
@@ -64,8 +73,8 @@ func Load(path string) (*Config, error) {
 }
 
 func (c *Config) Validate() error {
-	if c.Server.Port <= 0 || c.Server.Port > 65535 {
-		return fmt.Errorf("invalid server port: %d", c.Server.Port)
+	if c.GRPC.Port <= 0 || c.GRPC.Port > 65535 {
+		return fmt.Errorf("invalid grpc port: %d", c.GRPC.Port)
 	}
 
 	if c.Splunk.Host == "" {
